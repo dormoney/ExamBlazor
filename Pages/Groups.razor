@@ -1,0 +1,229 @@
+@page "/groups"
+
+<PageTitle>IT Школа - Группы</PageTitle>
+
+<div class="container mt-4">
+    <h1>Управление группами</h1>
+
+    @if (currentUser?.Role != "Admin")
+    {
+        <div class="alert alert-danger">
+            <h4>Доступ запрещен</h4>
+            <p>Эта страница доступна только администраторам.</p>
+        </div>
+        return;
+    }
+
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <button class="btn btn-primary" @onclick="() => ShowCreateGroup = true">
+                Создать новую группу
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        @if (groups.Any())
+        {
+            @foreach (var group in groups)
+            {
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>@group.Name</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">@group.Description</p>
+                            <p><strong>Преподаватель:</strong> @group.Teacher?.Name</p>
+                            <p><strong>Программа:</strong> @group.EducationalProgram?.Title</p>
+                            <p><strong>Студентов:</strong> @group.Students.Count</p>
+                            
+                            <div class="mt-3">
+                                <button class="btn btn-sm btn-info" @onclick="() => ViewGroupDetails(group)">
+                                    Детали
+                                </button>
+                                <button class="btn btn-sm btn-success" @onclick="() => AddStudentToGroup(group)">
+                                    Добавить студента
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-md-12">
+                <div class="alert alert-info">
+                    <h4>Нет групп</h4>
+                    <p>Создайте первую группу для начала работы.</p>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (ShowCreateGroup)
+    {
+        <div class="modal fade show" style="display: block;" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Создать группу</h5>
+                        <button type="button" class="btn-close" @onclick="() => ShowCreateGroup = false"></button>
+                    </div>
+                    <div class="modal-body">
+                        <EditForm Model="newGroup" OnValidSubmit="CreateGroup">
+                            <DataAnnotationsValidator />
+
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Название группы</label>
+                                <InputText id="name" class="form-control" @bind-Value="newGroup.Name" />
+                                <ValidationMessage For="@(() => newGroup.Name)" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Описание</label>
+                                <InputTextArea id="description" class="form-control" @bind-Value="newGroup.Description" rows="3" />
+                                <ValidationMessage For="@(() => newGroup.Description)" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="teacherId" class="form-label">Преподаватель</label>
+                                <InputSelect id="teacherId" class="form-control" @bind-Value="newGroup.TeacherId">
+                                    <option value="0">Выберите преподавателя</option>
+                                    @foreach (var teacher in teachers)
+                                    {
+                                        <option value="@teacher.Id">@teacher.Name</option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => newGroup.TeacherId)" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="programId" class="form-label">Образовательная программа</label>
+                                <InputSelect id="programId" class="form-control" @bind-Value="newGroup.EducationalProgramId">
+                                    <option value="0">Выберите программу</option>
+                                    @foreach (var program in programs)
+                                    {
+                                        <option value="@program.Id">@program.Title</option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => newGroup.EducationalProgramId)" />
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">Создать</button>
+                                <button type="button" class="btn btn-secondary" @onclick="() => ShowCreateGroup = false">Отмена</button>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-backdrop fade show"></div>
+    }
+
+    @if (selectedGroup != null)
+    {
+        <div class="modal fade show" style="display: block;" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Детали группы: @selectedGroup.Name</h5>
+                        <button type="button" class="btn-close" @onclick="() => selectedGroup = null"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Студенты группы</h6>
+                                @if (selectedGroup.Students.Any())
+                                {
+                                    <ul class="list-group">
+                                        @foreach (var student in selectedGroup.Students)
+                                        {
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                @student.Name
+                                                <span class="badge bg-primary rounded-pill">@student.Email</span>
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                                else
+                                {
+                                    <p class="text-muted">В группе нет студентов</p>
+                                }
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Уроки группы</h6>
+                                @if (selectedGroup.Lessons.Any())
+                                {
+                                    <ul class="list-group">
+                                        @foreach (var lesson in selectedGroup.Lessons)
+                                        {
+                                            <li class="list-group-item">@lesson.Title</li>
+                                        }
+                                    </ul>
+                                }
+                                else
+                                {
+                                    <p class="text-muted">В группе нет уроков</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-backdrop fade show"></div>
+    }
+</div>
+
+@code {
+    [Inject] private ApiRequestService apiService { get; set; }
+
+    private User currentUser;
+    private List<Group> groups = new();
+    private List<User> teachers = new();
+    private List<EducationalProgram> programs = new();
+    private Group selectedGroup;
+    private bool ShowCreateGroup = false;
+    private CreateGroupRequest newGroup = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentUser = await apiService.GetCurrentUser();
+        if (currentUser?.Role == "Admin")
+        {
+            await LoadData();
+        }
+    }
+
+    private async Task LoadData()
+    {
+        groups = await apiService.GetGroups();
+        var allUsers = await apiService.GetAllUsers();
+        teachers = allUsers.Where(u => u.Role == "Teacher").ToList();
+        programs = await apiService.GetEducationalPrograms();
+    }
+
+    private void ViewGroupDetails(Group group)
+    {
+        selectedGroup = group;
+    }
+
+    private void AddStudentToGroup(Group group)
+    {
+        // Логика добавления студента в группу
+    }
+
+    private async Task CreateGroup()
+    {
+        var success = await apiService.CreateGroup(newGroup);
+        if (success)
+        {
+            ShowCreateGroup = false;
+            newGroup = new();
+            await LoadData();
+        }
+    }
+} 

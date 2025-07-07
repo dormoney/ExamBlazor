@@ -1,0 +1,262 @@
+@page "/teacher"
+
+<PageTitle>IT Школа - Панель преподавателя</PageTitle>
+
+<div class="container mt-4">
+    <h1>Панель преподавателя</h1>
+
+    @if (currentUser?.Role != "Teacher")
+    {
+        <div class="alert alert-danger">
+            <h4>Доступ запрещен</h4>
+            <p>Эта страница доступна только преподавателям.</p>
+        </div>
+        return;
+    }
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Мои группы</h5>
+                </div>
+                <div class="card-body">
+                    @if (myGroups.Any())
+                    {
+                        @foreach (var group in myGroups)
+                        {
+                            <div class="card mb-2">
+                                <div class="card-body">
+                                    <h6>@group.Name</h6>
+                                    <p class="text-muted">@group.Description</p>
+                                    <p>Студентов: @group.Students.Count</p>
+                                    <button class="btn btn-sm btn-primary" @onclick="() => ViewGroupDetails(group)">
+                                        Просмотреть детали
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p>У вас пока нет групп.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Ближайшие уроки</h5>
+                </div>
+                <div class="card-body">
+                    @if (myLessons.Any())
+                    {
+                        @foreach (var lesson in myLessons.Take(5))
+                        {
+                            <div class="card mb-2">
+                                <div class="card-body">
+                                    <h6>@lesson.Title</h6>
+                                    <p class="text-muted">@lesson.Description</p>
+                                    <button class="btn btn-sm btn-success" @onclick="() => StartLesson(lesson)">
+                                        Начать урок
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p>Нет запланированных уроков.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (selectedGroup != null)
+    {
+        <div class="mt-4">
+            <h3>Группа: @selectedGroup.Name</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Студенты</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Имя</th>
+                                    <th>Email</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var student in selectedGroup.Students)
+                                {
+                                    <tr>
+                                        <td>@student.Name</td>
+                                        <td>@student.Email</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-info" @onclick="() => ViewStudentProgress(student)">
+                                                Прогресс
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <h5>Уроки группы</h5>
+                    @if (selectedGroup.Lessons.Any())
+                    {
+                        @foreach (var lesson in selectedGroup.Lessons)
+                        {
+                            <div class="card mb-2">
+                                <div class="card-body">
+                                    <h6>@lesson.Title</h6>
+                                    <p>@lesson.Description</p>
+                                    <button class="btn btn-sm btn-warning" @onclick="() => MarkAttendance(lesson)">
+                                        Отметить посещаемость
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p>Нет уроков в этой группе.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (selectedLesson != null)
+    {
+        <div class="modal fade show" style="display: block;" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Посещаемость: @selectedLesson.Title</h5>
+                        <button type="button" class="btn-close" @onclick="() => selectedLesson = null"></button>
+                    </div>
+                    <div class="modal-body">
+                        @if (selectedGroup != null)
+                        {
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Студент</th>
+                                            <th>Присутствовал</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var student in selectedGroup.Students)
+                                        {
+                                            <tr>
+                                                <td>@student.Name</td>
+                                                <td>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" 
+                                                               @bind="attendanceStatus[student.Id]" />
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-primary" @onclick="SaveAttendance">Сохранить</button>
+                                <button class="btn btn-secondary" @onclick="() => selectedLesson = null">Отмена</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-backdrop fade show"></div>
+    }
+</div>
+
+@code {
+    [Inject] private ApiRequestService apiService { get; set; }
+
+    private User currentUser;
+    private List<Group> allGroups = new();
+    private List<Lesson> allLessons = new();
+    private Group selectedGroup;
+    private Lesson selectedLesson;
+    private Dictionary<int, bool> attendanceStatus = new();
+
+    private List<Group> myGroups => allGroups.Where(g => g.TeacherId == currentUser?.Id).ToList();
+    private List<Lesson> myLessons => allLessons.Where(l => myGroups.Any(g => g.Lessons.Contains(l))).ToList();
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentUser = await apiService.GetCurrentUser();
+        if (currentUser?.Role == "Teacher")
+        {
+            await LoadData();
+        }
+    }
+
+    private async Task LoadData()
+    {
+        allGroups = await apiService.GetGroups();
+        allLessons = await apiService.GetLessons();
+    }
+
+    private void ViewGroupDetails(Group group)
+    {
+        selectedGroup = group;
+    }
+
+    private void StartLesson(Lesson lesson)
+    {
+        // Логика начала урока
+    }
+
+    private void ViewStudentProgress(User student)
+    {
+        // Логика просмотра прогресса студента
+    }
+
+    private void MarkAttendance(Lesson lesson)
+    {
+        selectedLesson = lesson;
+        if (selectedGroup != null)
+        {
+            attendanceStatus.Clear();
+            foreach (var student in selectedGroup.Students)
+            {
+                attendanceStatus[student.Id] = true; // По умолчанию присутствовал
+            }
+        }
+    }
+
+    private async Task SaveAttendance()
+    {
+        if (selectedLesson != null && selectedGroup != null)
+        {
+            foreach (var kvp in attendanceStatus)
+            {
+                var request = new AttendanceRequest
+                {
+                    StudentId = kvp.Key,
+                    LessonId = selectedLesson.Id,
+                    IsPresent = kvp.Value
+                };
+                await apiService.MarkAttendance(request);
+            }
+            selectedLesson = null;
+            selectedGroup = null;
+            attendanceStatus.Clear();
+        }
+    }
+} 

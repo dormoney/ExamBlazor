@@ -1,0 +1,150 @@
+@page "/materials"
+
+<PageTitle>IT Школа - Материалы</PageTitle>
+
+<div class="container mt-4">
+    <h1>Учебные материалы</h1>
+
+    @if (currentUser == null)
+    {
+        <div class="alert alert-warning">
+            <h4>Требуется авторизация</h4>
+            <p>Войдите в систему, чтобы просматривать материалы.</p>
+        </div>
+        return;
+    }
+
+    <div class="row">
+        <div class="col-md-12">
+            @if (materials.Any())
+            {
+                <div class="row">
+                    @foreach (var material in materials)
+                    {
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h6>@material.Title</h6>
+                                    <small class="text-muted">Урок: @material.Lesson?.Title</small>
+                                </div>
+                                <div class="card-body">
+                                    @if (!string.IsNullOrEmpty(material.Content))
+                                    {
+                                        <p class="card-text">@material.Content</p>
+                                    }
+                                    
+                                    @if (!string.IsNullOrEmpty(material.Link))
+                                    {
+                                        <div class="mt-2">
+                                            <a href="@material.Link" target="_blank" class="btn btn-primary btn-sm">
+                                                <i class="oi oi-external-link"></i> Открыть ссылку
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="card-footer">
+                                    <small class="text-muted">
+                                        Программа: @material.Lesson?.EducationalProgram?.Title
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <h4>Нет доступных материалов</h4>
+                    <p>Материалы появятся после добавления в группу и создания уроков.</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    @if (currentUser.Role == "Teacher" || currentUser.Role == "Admin")
+    {
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Добавить материал</h5>
+                    </div>
+                    <div class="card-body">
+                        <EditForm Model="newMaterial" OnValidSubmit="CreateMaterial">
+                            <DataAnnotationsValidator />
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="title" class="form-label">Название</label>
+                                        <InputText id="title" class="form-control" @bind-Value="newMaterial.Title" />
+                                        <ValidationMessage For="@(() => newMaterial.Title)" />
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="lessonId" class="form-label">Урок</label>
+                                        <InputSelect id="lessonId" class="form-control" @bind-Value="newMaterial.LessonId">
+                                            <option value="0">Выберите урок</option>
+                                            @foreach (var lesson in lessons)
+                                            {
+                                                <option value="@lesson.Id">@lesson.Title</option>
+                                            }
+                                        </InputSelect>
+                                        <ValidationMessage For="@(() => newMaterial.LessonId)" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="content" class="form-label">Содержание</label>
+                                <InputTextArea id="content" class="form-control" @bind-Value="newMaterial.Content" rows="3" />
+                                <ValidationMessage For="@(() => newMaterial.Content)" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="link" class="form-label">Ссылка (необязательно)</label>
+                                <InputText id="link" class="form-control" @bind-Value="newMaterial.Link" placeholder="https://..." />
+                                <ValidationMessage For="@(() => newMaterial.Link)" />
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Добавить материал</button>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Inject] private ApiRequestService apiService { get; set; }
+
+    private User currentUser;
+    private List<Material> materials = new();
+    private List<Lesson> lessons = new();
+    private Material newMaterial = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentUser = await apiService.GetCurrentUser();
+        if (currentUser != null)
+        {
+            await LoadData();
+        }
+    }
+
+    private async Task LoadData()
+    {
+        materials = await apiService.GetMaterials();
+        lessons = await apiService.GetLessons();
+    }
+
+    private async Task CreateMaterial()
+    {
+        // Логика создания материала
+        newMaterial = new();
+        await LoadData();
+    }
+} 

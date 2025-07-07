@@ -1,0 +1,210 @@
+@page "/schedule"
+
+<PageTitle>IT Школа - Расписание</PageTitle>
+
+<div class="container mt-4">
+    <h1>Мое расписание</h1>
+
+    @if (currentUser?.Role != "Student")
+    {
+        <div class="alert alert-danger">
+            <h4>Доступ запрещен</h4>
+            <p>Эта страница доступна только студентам.</p>
+        </div>
+        return;
+    }
+
+    <div class="row">
+        <div class="col-md-8">
+            @if (myGroups.Any())
+            {
+                @foreach (var group in myGroups)
+                {
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5>Группа: @group.Name</h5>
+                            <p class="text-muted mb-0">Преподаватель: @group.Teacher?.Name</p>
+                        </div>
+                        <div class="card-body">
+                            <h6>Программа: @group.EducationalProgram?.Title</h6>
+                            <p>@group.EducationalProgram?.Description</p>
+                            
+                            @if (group.Lessons.Any())
+                            {
+                                <h6 class="mt-3">Уроки:</h6>
+                                <div class="row">
+                                    @foreach (var lesson in group.Lessons)
+                                    {
+                                        <div class="col-md-6 mb-3">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <h6>@lesson.Title</h6>
+                                                    <p class="text-muted">@lesson.Description</p>
+                                                    <button class="btn btn-sm btn-primary" @onclick="() => ViewLesson(lesson)">
+                                                        Просмотреть урок
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="text-muted">В этой группе пока нет уроков.</p>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <h4>Вы не состоите ни в одной группе</h4>
+                    <p>Обратитесь к администратору для добавления в группу.</p>
+                </div>
+            }
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Ближайшие занятия</h5>
+                </div>
+                <div class="card-body">
+                    @if (upcomingLessons.Any())
+                    {
+                        @foreach (var lesson in upcomingLessons.Take(5))
+                        {
+                            <div class="card mb-2">
+                                <div class="card-body">
+                                    <h6>@lesson.Title</h6>
+                                    <p class="text-muted small">@lesson.Description</p>
+                                    <span class="badge bg-primary">Скоро</span>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted">Нет запланированных занятий.</p>
+                    }
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5>Мой прогресс</h5>
+                </div>
+                <div class="card-body">
+                    @if (myProgress.Any())
+                    {
+                        var completedLessons = myProgress.Count(p => p.IsCompleted);
+                        var totalLessons = myProgress.Count;
+                        var percentage = totalLessons > 0 ? (completedLessons * 100) / totalLessons : 0;
+
+                        <div class="progress mb-3">
+                            <div class="progress-bar" role="progressbar" style="width: @percentage%">
+                                @percentage%
+                            </div>
+                        </div>
+                        <p>Завершено уроков: @completedLessons из @totalLessons</p>
+                    }
+                    else
+                    {
+                        <p class="text-muted">Прогресс пока не отслеживается.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (selectedLesson != null)
+    {
+        <div class="modal fade show" style="display: block;" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">@selectedLesson.Title</h5>
+                        <button type="button" class="btn-close" @onclick="() => selectedLesson = null"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h6>Описание</h6>
+                        <p>@selectedLesson.Description</p>
+
+                        @if (selectedLesson.Materials.Any())
+                        {
+                            <h6 class="mt-3">Материалы</h6>
+                            @foreach (var material in selectedLesson.Materials)
+                            {
+                                <div class="card mb-2">
+                                    <div class="card-body">
+                                        <h6>@material.Title</h6>
+                                        @if (!string.IsNullOrEmpty(material.Content))
+                                        {
+                                            <p>@material.Content</p>
+                                        }
+                                        @if (!string.IsNullOrEmpty(material.Link))
+                                        {
+                                            <a href="@material.Link" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                Открыть ссылку
+                                            </a>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        }
+
+                        <div class="mt-3">
+                            <button class="btn btn-success" @onclick="() => MarkLessonCompleted(selectedLesson)">
+                                Отметить как завершенный
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-backdrop fade show"></div>
+    }
+</div>
+
+@code {
+    [Inject] private ApiRequestService apiService { get; set; }
+
+    private User currentUser;
+    private List<Group> allGroups = new();
+    private List<StudentProgress> myProgress = new();
+    private Lesson selectedLesson;
+
+    private List<Group> myGroups => allGroups.Where(g => g.Students.Any(s => s.Id == currentUser?.Id)).ToList();
+    private List<Lesson> upcomingLessons => myGroups.SelectMany(g => g.Lessons).ToList();
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentUser = await apiService.GetCurrentUser();
+        if (currentUser?.Role == "Student")
+        {
+            await LoadData();
+        }
+    }
+
+    private async Task LoadData()
+    {
+        allGroups = await apiService.GetGroups();
+        if (currentUser != null)
+        {
+            myProgress = await apiService.GetStudentProgress(currentUser.Id);
+        }
+    }
+
+    private void ViewLesson(Lesson lesson)
+    {
+        selectedLesson = lesson;
+    }
+
+    private async Task MarkLessonCompleted(Lesson lesson)
+    {
+        // Логика отметки урока как завершенного
+        selectedLesson = null;
+    }
+} 

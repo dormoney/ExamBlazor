@@ -1,0 +1,101 @@
+is_global = true
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = ExamBlazor
+build_property.RootNamespace = ExamBlazor
+build_property.ProjectDir = C:\Users\redmi\Desktop\Kvalik Murin_Kirill_322\ExamBlazor\ExamBlazor\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\redmi\Desktop\Kvalik Murin_Kirill_322\ExamBlazor\ExamBlazor
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 8.0
+build_property.EnableCodeStyleSeverity = 
+
+[C:/Users/redmi/Desktop/Kvalik Murin_Kirill_322/ExamBlazor/ExamBlazor/Components/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xfSW1wb3J0cy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/redmi/Desktop/Kvalik Murin_Kirill_322/ExamBlazor/ExamBlazor/Pages/Admin.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/redmi/Desktop/Kvalik Murin_Kirill_322/ExamBlazor/ExamBlazor/Pages/App.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXBwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/redmi/Desktop/Kvalik Murin_Kirill_322/ExamBlazor/ExamBlazor/Pages/Counter.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ291bnRlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/redmi/Desktop/Kvalik Murin_Kirill_322/ExamBlazor/ExamBlazor/Pages/Error.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/redmi/Desktop/Kvalik Murin_Kirill_322/ExamBlazor/ExamBlazor/Pages/Groups.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcR3JvdXBzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/redmi/Desktop/Kvalik Murin_Kirill_322/ExamBlazor/ExamBlazor/Pages/Home.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9tZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/redmi/Desktop/Kvalik Murin_Kirill_322/ExamBlazor/ExamBlazor/Pages/Lessons.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTGVzc29ucy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/redmi/Desktop/Kvalik Murin_Kirill_322/ExamBlazor/ExamBlazor/Pages/Login.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/redmi/Desktop/Kvalik Murin_Kirill_322/ExamBlazor/ExamBlazor/Pages/Materials.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWF0ZXJpYWxzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/redmi/Desktop/Kvalik Murin_Kirill_322/ExamBlazor/ExamBlazor/Pages/Programs.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZ3JhbXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/redmi/Desktop/Kvalik Murin_Kirill_322/ExamBlazor/ExamBlazor/Pages/Progress.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZ3Jlc3MucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/redmi/Desktop/Kvalik Murin_Kirill_322/ExamBlazor/ExamBlazor/Pages/Register.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVnaXN0ZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/redmi/Desktop/Kvalik Murin_Kirill_322/ExamBlazor/ExamBlazor/Pages/Schedule.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2NoZWR1bGUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/redmi/Desktop/Kvalik Murin_Kirill_322/ExamBlazor/ExamBlazor/Pages/TeacherPanel.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGVhY2hlclBhbmVsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/redmi/Desktop/Kvalik Murin_Kirill_322/ExamBlazor/ExamBlazor/Pages/Weather.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcV2VhdGhlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/redmi/Desktop/Kvalik Murin_Kirill_322/ExamBlazor/ExamBlazor/Pages/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/redmi/Desktop/Kvalik Murin_Kirill_322/ExamBlazor/ExamBlazor/Pages/Layout/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTGF5b3V0XE1haW5MYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-ogd6iv3d23
+
+[C:/Users/redmi/Desktop/Kvalik Murin_Kirill_322/ExamBlazor/ExamBlazor/Pages/Layout/NavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTGF5b3V0XE5hdk1lbnUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-ecqx5gvar8
+
+[C:/Users/redmi/Desktop/Kvalik Murin_Kirill_322/ExamBlazor/ExamBlazor/Pages/_Host.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0hvc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 

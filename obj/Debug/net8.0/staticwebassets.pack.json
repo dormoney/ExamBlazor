@@ -1,0 +1,45 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\redmi\\Desktop\\Kvalik Murin_Kirill_322\\ExamBlazor\\ExamBlazor\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\ExamBlazor.bundle.scp.css",
+      "PackagePath": "staticwebassets\\ExamBlazor.q8ydx7ny9b.bundle.scp.css"
+    },
+    {
+      "Id": "C:\\Users\\redmi\\Desktop\\Kvalik Murin_Kirill_322\\ExamBlazor\\ExamBlazor\\wwwroot\\app.css",
+      "PackagePath": "staticwebassets\\app.css"
+    },
+    {
+      "Id": "C:\\Users\\redmi\\Desktop\\Kvalik Murin_Kirill_322\\ExamBlazor\\ExamBlazor\\wwwroot\\bootstrap\\bootstrap.min.css",
+      "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css"
+    },
+    {
+      "Id": "C:\\Users\\redmi\\Desktop\\Kvalik Murin_Kirill_322\\ExamBlazor\\ExamBlazor\\wwwroot\\bootstrap\\bootstrap.min.css.map",
+      "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\redmi\\Desktop\\Kvalik Murin_Kirill_322\\ExamBlazor\\ExamBlazor\\wwwroot\\favicon.png",
+      "PackagePath": "staticwebassets\\favicon.png"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.ExamBlazor.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.ExamBlazor.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.ExamBlazor.props",
+      "PackagePath": "build\\ExamBlazor.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.ExamBlazor.props",
+      "PackagePath": "buildMultiTargeting\\ExamBlazor.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.ExamBlazor.props",
+      "PackagePath": "buildTransitive\\ExamBlazor.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

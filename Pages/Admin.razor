@@ -1,0 +1,257 @@
+@page "/admin"
+
+<PageTitle>IT Школа - Админ панель</PageTitle>
+
+<div class="container mt-4">
+    <h1>Панель администратора</h1>
+
+    @if (currentUser?.Role != "Admin")
+    {
+        <div class="alert alert-danger">
+            <h4>Доступ запрещен</h4>
+            <p>Эта страница доступна только администраторам.</p>
+        </div>
+        return;
+    }
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Пользователи</h5>
+                </div>
+                <div class="card-body">
+                    <p>Всего пользователей: @users.Count</p>
+                    <button class="btn btn-primary" @onclick="() => ShowUsers = !ShowUsers">
+                        @(ShowUsers ? "Скрыть" : "Показать") пользователей
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Образовательные программы</h5>
+                </div>
+                <div class="card-body">
+                    <p>Всего программ: @programs.Count</p>
+                    <button class="btn btn-success" @onclick="() => ShowCreateProgram = true">
+                        Создать программу
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Группы</h5>
+                </div>
+                <div class="card-body">
+                    <p>Всего групп: @groups.Count</p>
+                    <button class="btn btn-info" @onclick="() => ShowCreateGroup = true">
+                        Создать группу
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (ShowUsers)
+    {
+        <div class="mt-4">
+            <h3>Пользователи</h3>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Имя</th>
+                            <th>Email</th>
+                            <th>Роль</th>
+                            <th>Дата регистрации</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in users)
+                        {
+                            <tr>
+                                <td>@user.Id</td>
+                                <td>@user.Name</td>
+                                <td>@user.Email</td>
+                                <td>@GetRoleDisplayName(user.Role)</td>
+                                <td>@user.CreatedAt.ToString("dd.MM.yyyy")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+    @if (ShowCreateProgram)
+    {
+        <div class="modal fade show" style="display: block;" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Создать образовательную программу</h5>
+                        <button type="button" class="btn-close" @onclick="() => ShowCreateProgram = false"></button>
+                    </div>
+                    <div class="modal-body">
+                        <EditForm Model="newProgram" OnValidSubmit="CreateProgram">
+                            <DataAnnotationsValidator />
+
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Название</label>
+                                <InputText id="title" class="form-control" @bind-Value="newProgram.Title" />
+                                <ValidationMessage For="@(() => newProgram.Title)" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Описание</label>
+                                <InputTextArea id="description" class="form-control" @bind-Value="newProgram.Description" rows="3" />
+                                <ValidationMessage For="@(() => newProgram.Description)" />
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">Создать</button>
+                                <button type="button" class="btn btn-secondary" @onclick="() => ShowCreateProgram = false">Отмена</button>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-backdrop fade show"></div>
+    }
+
+    @if (ShowCreateGroup)
+    {
+        <div class="modal fade show" style="display: block;" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Создать группу</h5>
+                        <button type="button" class="btn-close" @onclick="() => ShowCreateGroup = false"></button>
+                    </div>
+                    <div class="modal-body">
+                        <EditForm Model="newGroup" OnValidSubmit="CreateGroup">
+                            <DataAnnotationsValidator />
+
+                            <div class="mb-3">
+                                <label for="groupName" class="form-label">Название группы</label>
+                                <InputText id="groupName" class="form-control" @bind-Value="newGroup.Name" />
+                                <ValidationMessage For="@(() => newGroup.Name)" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="groupDescription" class="form-label">Описание</label>
+                                <InputTextArea id="groupDescription" class="form-control" @bind-Value="newGroup.Description" rows="3" />
+                                <ValidationMessage For="@(() => newGroup.Description)" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="teacherId" class="form-label">Преподаватель</label>
+                                <InputSelect id="teacherId" class="form-control" @bind-Value="newGroup.TeacherId">
+                                    <option value="0">Выберите преподавателя</option>
+                                    @foreach (var teacher in teachers)
+                                    {
+                                        <option value="@teacher.Id">@teacher.Name</option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => newGroup.TeacherId)" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="programId" class="form-label">Образовательная программа</label>
+                                <InputSelect id="programId" class="form-control" @bind-Value="newGroup.EducationalProgramId">
+                                    <option value="0">Выберите программу</option>
+                                    @foreach (var program in programs)
+                                    {
+                                        <option value="@program.Id">@program.Title</option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => newGroup.EducationalProgramId)" />
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">Создать</button>
+                                <button type="button" class="btn btn-secondary" @onclick="() => ShowCreateGroup = false">Отмена</button>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-backdrop fade show"></div>
+    }
+</div>
+
+@code {
+    [Inject] private ApiRequestService apiService { get; set; }
+
+    private User currentUser;
+    private List<User> users = new();
+    private List<EducationalProgram> programs = new();
+    private List<Group> groups = new();
+    private List<User> teachers = new();
+
+    private bool ShowUsers = false;
+    private bool ShowCreateProgram = false;
+    private bool ShowCreateGroup = false;
+
+    private EducationalProgram newProgram = new();
+    private CreateGroupRequest newGroup = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentUser = await apiService.GetCurrentUser();
+        if (currentUser?.Role == "Admin")
+        {
+            await LoadData();
+        }
+    }
+
+    private async Task LoadData()
+    {
+        users = await apiService.GetAllUsers();
+        programs = await apiService.GetEducationalPrograms();
+        groups = await apiService.GetGroups();
+        teachers = users.Where(u => u.Role == "Teacher").ToList();
+    }
+
+    private async Task CreateProgram()
+    {
+        var success = await apiService.CreateEducationalProgram(newProgram);
+        if (success)
+        {
+            ShowCreateProgram = false;
+            newProgram = new();
+            await LoadData();
+        }
+    }
+
+    private async Task CreateGroup()
+    {
+        var success = await apiService.CreateGroup(newGroup);
+        if (success)
+        {
+            ShowCreateGroup = false;
+            newGroup = new();
+            await LoadData();
+        }
+    }
+
+    private string GetRoleDisplayName(string role)
+    {
+        return role switch
+        {
+            "Admin" => "Администратор",
+            "Teacher" => "Преподаватель",
+            "Student" => "Студент",
+            _ => role
+        };
+    }
+} 

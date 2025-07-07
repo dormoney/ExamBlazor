@@ -1,0 +1,95 @@
+﻿@page "/"
+
+<PageTitle>IT Школа - Главная</PageTitle>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <h1>Добро пожаловать в IT Школу!</h1>
+            <p class="lead">
+                Платформа для организации онлайн-занятий по программированию. 
+                Ученики объединяются в группы, проходят образовательные программы, 
+                участвуют в уроках, а преподаватели ведут их обучение и отслеживают прогресс.
+            </p>
+            
+            @if (currentUser == null)
+            {
+                <div class="mt-4">
+                    <h3>Начните обучение прямо сейчас!</h3>
+                    <p>Зарегистрируйтесь или войдите в систему, чтобы получить доступ к курсам.</p>
+                    <div class="d-flex gap-2">
+                        <NavLink class="btn btn-primary me-2" href="/register">Регистрация</NavLink>
+                        <NavLink class="btn btn-outline-primary" href="/login">Вход</NavLink>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="mt-4">
+                    <h3>Добро пожаловать, @currentUser.Name!</h3>
+                    <p>Ваша роль: @GetRoleDisplayName(currentUser.Role)</p>
+                    
+                    @if (currentUser.Role == "Student")
+                    {
+                        <div class="alert alert-info">
+                            <h5>Для студентов:</h5>
+                            <ul>
+                                <li>Просматривайте расписание занятий</li>
+                                <li>Изучайте материалы к урокам</li>
+                                <li>Отслеживайте свой прогресс</li>
+                                <li>Участвуйте в обсуждениях</li>
+                            </ul>
+                        </div>
+                    }
+                    else if (currentUser.Role == "Teacher")
+                    {
+                        <div class="alert alert-info">
+                            <h5>Для преподавателей:</h5>
+                            <ul>
+                                <li>Проводите занятия</li>
+                                <li>Отмечайте посещаемость</li>
+                                <li>Публикуйте материалы</li>
+                                <li>Отслеживайте прогресс учеников</li>
+                            </ul>
+                        </div>
+                    }
+                    else if (currentUser.Role == "Admin")
+                    {
+                        <div class="alert alert-info">
+                            <h5>Для администраторов:</h5>
+                            <ul>
+                                <li>Создавайте образовательные программы</li>
+                                <li>Формируйте группы</li>
+                                <li>Назначайте преподавателей</li>
+                                <li>Управляйте расписанием</li>
+                            </ul>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Inject] private NavigationManager navigationManager { get; set; }
+    [Inject] private ApiRequestService apiService { get; set; }
+    
+    private User currentUser;
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentUser = await apiService.GetCurrentUser();
+    }
+
+    private string GetRoleDisplayName(string role)
+    {
+        return role switch
+        {
+            "Admin" => "Администратор",
+            "Teacher" => "Преподаватель",
+            "Student" => "Студент",
+            _ => role
+        };
+    }
+}

@@ -1,0 +1,194 @@
+@page "/progress"
+
+<PageTitle>IT Школа - Мой прогресс</PageTitle>
+
+<div class="container mt-4">
+    <h1>Мой прогресс</h1>
+
+    @if (currentUser?.Role != "Student")
+    {
+        <div class="alert alert-danger">
+            <h4>Доступ запрещен</h4>
+            <p>Эта страница доступна только студентам.</p>
+        </div>
+        return;
+    }
+
+    <div class="row">
+        <div class="col-md-8">
+            @if (myProgress.Any())
+            {
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Прогресс по урокам</h5>
+                    </div>
+                    <div class="card-body">
+                        @foreach (var progress in myProgress)
+                        {
+                            <div class="card mb-2">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-8">
+                                            <h6>@progress.Lesson?.Title</h6>
+                                            <p class="text-muted mb-0">@progress.Lesson?.Description</p>
+                                            <small class="text-muted">
+                                                Программа: @progress.Lesson?.EducationalProgram?.Title
+                                            </small>
+                                        </div>
+                                        <div class="col-md-4 text-end">
+                                            @if (progress.IsCompleted)
+                                            {
+                                                <span class="badge bg-success">Завершен</span>
+                                                <br />
+                                                <small class="text-muted">
+                                                    @progress.CompletedAt.ToString("dd.MM.yyyy HH:mm")
+                                                </small>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning">В процессе</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <h4>Прогресс не отслеживается</h4>
+                    <p>Начните изучать уроки, чтобы отслеживать свой прогресс.</p>
+                </div>
+            }
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Статистика</h5>
+                </div>
+                <div class="card-body">
+                    @if (myProgress.Any())
+                    {
+                        var completedLessons = myProgress.Count(p => p.IsCompleted);
+                        var totalLessons = myProgress.Count;
+                        var percentage = totalLessons > 0 ? (completedLessons * 100) / totalLessons : 0;
+
+                        <div class="text-center mb-3">
+                            <h3>@percentage%</h3>
+                            <p class="text-muted">Общий прогресс</p>
+                        </div>
+
+                        <div class="progress mb-3">
+                            <div class="progress-bar" role="progressbar" style="width: @percentage%">
+                                @percentage%
+                            </div>
+                        </div>
+
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <h4>@completedLessons</h4>
+                                <small class="text-muted">Завершено</small>
+                            </div>
+                            <div class="col-6">
+                                <h4>@(totalLessons - completedLessons)</h4>
+                                <small class="text-muted">Осталось</small>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <h6>Мои группы</h6>
+                        @if (myGroups.Any())
+                        {
+                            @foreach (var group in myGroups)
+                            {
+                                <div class="card mb-2">
+                                    <div class="card-body p-2">
+                                        <h6 class="mb-1">@group.Name</h6>
+                                        <small class="text-muted">
+                                            Преподаватель: @group.Teacher?.Name
+                                        </small>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted small">Вы не состоите ни в одной группе</p>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted">Нет данных для отображения</p>
+                    }
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5>Рекомендации</h5>
+                </div>
+                <div class="card-body">
+                    @if (myProgress.Any())
+                    {
+                        var incompleteLessons = myProgress.Where(p => !p.IsCompleted).ToList();
+                        if (incompleteLessons.Any())
+                        {
+                            <h6>Следующие уроки для изучения:</h6>
+                            <ul class="list-unstyled">
+                                @foreach (var lesson in incompleteLessons.Take(3))
+                                {
+                                    <li class="mb-2">
+                                        <strong>@lesson.Lesson?.Title</strong>
+                                        <br />
+                                        <small class="text-muted">@lesson.Lesson?.Description</small>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <p class="text-success">Поздравляем! Вы завершили все уроки!</p>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted">Начните изучение уроков для получения рекомендаций</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Inject] private ApiRequestService apiService { get; set; }
+
+    private User currentUser;
+    private List<StudentProgress> myProgress = new();
+    private List<Group> allGroups = new();
+
+    private List<Group> myGroups => allGroups.Where(g => g.Students.Any(s => s.Id == currentUser?.Id)).ToList();
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentUser = await apiService.GetCurrentUser();
+        if (currentUser?.Role == "Student")
+        {
+            await LoadData();
+        }
+    }
+
+    private async Task LoadData()
+    {
+        if (currentUser != null)
+        {
+            myProgress = await apiService.GetStudentProgress(currentUser.Id);
+        }
+        allGroups = await apiService.GetGroups();
+    }
+} 
